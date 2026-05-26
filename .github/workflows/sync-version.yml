@@ -31,12 +31,12 @@ jobs:
           VERSION="${VERSION//,/\.}"
 
           if [ -z "$VERSION" ]; then
-            echo "❌ Version missing in dispatch payload"
+            echo "Version missing in dispatch payload"
             exit 1
           fi
 
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-            echo "❌ Invalid version format: $VERSION"
+            echo "Invalid version format: $VERSION"
             exit 1
           fi
 
@@ -90,7 +90,7 @@ jobs:
           GIT_TOKEN: ${{ secrets.PAT }}
         run: |
           git clone --depth 1 \
-            "https://x-access-token:${GIT_TOKEN}@github.com/froala-travis-bot/wysiwyg-editor.git" \
+            "https://x-access-token:${GIT_TOKEN}@github.com/froala/wysiwyg-editor.git" \
             /tmp/wysiwyg-main
 
           rsync -av --delete /tmp/wysiwyg-main/js/ public/js/
