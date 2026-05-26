@@ -13,18 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # --------------------------------------------
-      # Checkout repository
-      # --------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.PAT }}
           fetch-depth: 0
 
-      # --------------------------------------------
-      # Load & validate version (from primary repo)
-      # --------------------------------------------
       - name: Load & validate version
         run: |
           VERSION="${{ github.event.client_payload.version }}"
@@ -42,9 +36,7 @@ jobs:
 
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Dispatching version $VERSION"
-       # --------------------------------------------
-      # Compare current version vs incoming version
-      # --------------------------------------------
+
       - name: Compare current version
         run: |
           CURRENT_VERSION=$(grep -RhoE '[0-9]+\.[0-9]+\.[0-9]+' public admin | head -n 1)
@@ -65,9 +57,6 @@ jobs:
           echo "Version change detected. Proceeding."
 
 
-      # --------------------------------------------
-      # Prepare release branch
-      # --------------------------------------------
       - name: Prepare release branch
         run: |
           BRANCH="release-v${VERSION}"
@@ -82,9 +71,7 @@ jobs:
             git checkout -b "$BRANCH"
           fi
 
-      # --------------------------------------------
-      # Sync assets from primary repo 
-      # --------------------------------------------
+
       - name: Sync assets from primary repo
         env:
           GIT_TOKEN: ${{ secrets.PAT }}
@@ -98,9 +85,7 @@ jobs:
           rsync -av --delete /tmp/wysiwyg-main/js/ admin/js/
           rsync -av --delete /tmp/wysiwyg-main/css/ admin/css/
 
-      # --------------------------------------------
-      # Commit & push
-      # --------------------------------------------
+
       - name: Commit & push
         run: |
           git config user.name "froala-travis-bot"
@@ -110,9 +95,7 @@ jobs:
           git commit -m "chore: release WordPress plugin v${VERSION}" || echo "Nothing to commit"
           git push origin "$BRANCH"
 
-      # --------------------------------------------
-      # Create Pull Request (Rails-style, release-gated)
-      # --------------------------------------------
+
       - name: Create Pull Request
         env:
           GH_TOKEN: ${{ secrets.PAT }}
